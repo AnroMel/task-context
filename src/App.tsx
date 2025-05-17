@@ -1,6 +1,8 @@
+import { useTheme } from './Context';
 import { useState } from 'react';
-import { data, IItem } from './data';
+import { data } from './data';
 import './styles.css';
+import { ThemeProvider } from './Context';
 
 type Theme = 'light' | 'dark';
 
@@ -11,30 +13,28 @@ export function App() {
         setCurrentTheme(currentTheme === 'light' ? 'dark' : 'light');
     }
 
-    const className = `app app_${currentTheme}`;
     return (
-        <div className={className}>
-            <button onClick={changeTheme}>Toggle theme</button>
-            <List theme={currentTheme} data={data} />
-        </div>
+        <ThemeProvider theme={currentTheme}>
+            <div className={`app app_${currentTheme}`}>
+                <button onClick={changeTheme}>Toggle theme</button>
+                <List data={data} />
+            </div>
+        </ThemeProvider>
     );
 }
 
-function List(props: { theme: Theme; data: IItem[] }) {
+function List({ data }: { data: { id: number; name: string }[] }) {
     return (
         <div>
             {data.map((item) => (
-                <ListItem
-                    theme={props.theme}
-                    caption={item.name}
-                    key={item.id}
-                />
+                <ListItem caption={item.name} key={item.id} />
             ))}
         </div>
     );
 }
 
-function ListItem(props: { theme: Theme; caption: string }) {
-    const className = `listItem listItem_${props.theme}`;
-    return <div className={className}>{props.caption}</div>;
+function ListItem({ caption }: { caption: string }) {
+    const theme = useTheme();
+    const className = `listItem listItem_${theme}`;
+    return <div className={className}>{caption}</div>;
 }
